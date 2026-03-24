@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Science Fundamentals – Module 1: NumPy | HackSkill</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white:       #ffffff;
+    --snow:        #f8f8fc;
+    --paper:       #f2f1f8;
+    --ink:         #0f0f1a;
+    --ink-mid:     #2e2e45;
+    --ink-soft:    #5a5a7a;
+    --muted:       #9898b8;
+    --border:      #e2e0f0;
+
+    /* Module 1 accent — warm orange/amber to differentiate from Module 0's blue */
+    --accent:      #e05c1a;
+    --accent-dark: #b84510;
+    --accent-bg:   #fef4ee;
+    --accent-mid:  #fbd5bc;
+
+    --navy:        #1b2a6b;
+    --navy-bg:     #eef1fc;
+    --navy-mid:    #b8c3ef;
+
+    --teal:        #0f766e;
+    --teal-bg:     #f0fdfa;
+    --teal-mid:    #99f6e4;
+
+    --green:       #166534;
+    --green-bg:    #f0fdf4;
+    --green-mid:   #86efac;
+
+    --ruby:        #9f1239;
+    --ruby-bg:     #fff1f2;
+
+    --gold:        #92400e;
+    --gold-bg:     #fffbeb;
+    --gold-mid:    #fde68a;
+
+    --code-bg:     #13131f;
+    --code-text:   #e2e0f0;
+
+    --shadow:      0 2px 16px rgba(15,15,26,.07);
+    --shadow-lg:   0 8px 40px rgba(15,15,26,.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #0f0f1a;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; overflow: hidden;
+  }
+
+  /* ── Deck ── */
+  .deck { position: relative; width:100vw; height:100vh; }
+
+  .slide {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    background: var(--white);
+    opacity:0; pointer-events:none;
+    transition: opacity .4s ease, transform .4s ease;
+    transform: translateX(24px);
+    overflow: hidden;
+  }
+  .slide.active { opacity:1; pointer-events:all; transform: translateX(0); }
+
+  /* ── Header strip ── */
+  .hstrip {
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 12px 40px;
+    background: var(--ink);
+    flex-shrink: 0;
+  }
+  .hstrip-left {
+    display:flex; align-items:center; gap:14px;
+  }
+  .module-badge {
+    background: var(--accent); color: white;
+    font-size:11px; font-weight:700; letter-spacing:1.5px;
+    padding: 4px 12px; border-radius:4px; text-transform:uppercase;
+  }
+  .hstrip-title {
+    font-family:'Fraunces',serif; font-size:15px; color:rgba(255,255,255,.9);
+    font-weight:400;
+  }
+  .hstrip-right {
+    display:flex; align-items:center; gap:16px;
+  }
+  .slide-num { font-size:12px; color:rgba(255,255,255,.4); font-weight:500; letter-spacing:.5px; }
+  .video-tag {
+    font-size:11px; font-weight:700; letter-spacing:1px; padding:3px 10px;
+    border-radius:4px; text-transform:uppercase;
+  }
+  .video-tag.v1 { background:rgba(224,92,26,.25); color:#fb923c; border:1px solid rgba(224,92,26,.4); }
+  .video-tag.v2 { background:rgba(27,42,107,.4); color:#93c5fd; border:1px solid rgba(27,42,107,.6); }
+
+  /* ── Progress ── */
+  .prog-track { height:3px; background:var(--border); flex-shrink:0; }
+  .prog-fill { height:100%; background: linear-gradient(90deg, var(--accent), var(--navy)); transition:width .4s ease; }
+
+  /* ── Body ── */
+  .body { flex:1; display:flex; flex-direction:column; padding:36px 52px; overflow:hidden; }
+  .body.center { align-items:center; justify-content:center; text-align:center; }
+  .body.split { flex-direction:row; gap:44px; align-items:stretch; }
+  .body.no-pad { padding:0; }
+
+  /* ── Type ── */
+  .eyebrow {
+    font-size:10.5px; font-weight:700; letter-spacing:2.5px;
+    text-transform:uppercase; color:var(--accent);
+    display:flex; align-items:center; gap:9px; margin-bottom:12px;
+  }
+  .eyebrow::before { content:''; display:block; width:20px; height:2px; background:var(--accent); }
+
+  h1.cover-title {
+    font-family:'Fraunces',serif; font-size:clamp(38px,4.5vw,58px);
+    color:var(--ink); line-height:1.1; letter-spacing:-1.5px; margin-bottom:16px;
+  }
+  h1.cover-title em { color:var(--accent); font-style:italic; }
+
+  h2.sec {
+    font-family:'Fraunces',serif; font-size:clamp(26px,3vw,40px);
+    color:var(--ink); line-height:1.15; letter-spacing:-.6px; margin-bottom:22px;
+  }
+  h2.sec em { color:var(--accent); font-style:italic; }
+  h2.sec.navy em { color:var(--navy); }
+  h2.sec.teal em { color:var(--teal); }
+
+  .lead { font-size:17px; color:var(--ink-soft); line-height:1.7; max-width:640px; }
+  .body-t { font-size:14.5px; color:var(--ink-soft); line-height:1.7; }
+
+  /* ── Cards ── */
+  .card {
+    background:var(--snow); border:1px solid var(--border);
+    border-radius:12px; padding:20px 24px;
+  }
+  .card-label { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:1.8px; margin-bottom:8px; }
+
+  /* ── Chip ── */
+  .chip {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 13px; border-radius:999px;
+    font-size:12.5px; font-weight:600;
+  }
+  .chip.or { background:var(--accent-bg); color:var(--accent); }
+  .chip.nv { background:var(--navy-bg);   color:var(--navy);   }
+  .chip.tl { background:var(--teal-bg);   color:var(--teal);   }
+  .chip.gn { background:var(--green-bg);  color:var(--green);  }
+  .chip.gd { background:var(--gold-bg);   color:var(--gold);   }
+  .chip.rb { background:var(--ruby-bg);   color:var(--ruby);   }
+
+  /* ── Code block ── */
+  .code {
+    background:var(--code-bg); border-radius:10px;
+    padding:20px 24px; font-family:'JetBrains Mono',monospace;
+    font-size:13px; line-height:1.85; color:var(--code-text);
+    overflow-x:auto; position:relative;
+  }
+  .code .kw  { color:#c792ea; }
+  .code .fn  { color:#82aaff; }
+  .code .st  { color:#c3e88d; }
+  .code .cm  { color:#546e7a; font-style:italic; }
+  .code .nm  { color:#f78c6c; }
+  .code .op  { color:#89ddff; }
+  .code .out { color:#c3e88d; }
+  .code-label {
+    position:absolute; top:10px; right:14px;
+    font-size:10px; font-weight:700; letter-spacing:1.5px;
+    color:rgba(255,255,255,.25); text-transform:uppercase;
+  }
+
+  /* ── Grid ── */
+  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+
+  /* ── Highlight ── */
+  .hl {
+    border-left:4px solid var(--accent); background:var(--accent-bg);
+    border-radius:0 10px 10px 0; padding:14px 18px; margin:12px 0;
+    font-size:14px; color:var(--ink-mid); line-height:1.6;
+  }
+  .hl.nv { border-color:var(--navy); background:var(--navy-bg); }
+  .hl.tl { border-color:var(--teal); background:var(--teal-bg); }
+  .hl.gn { border-color:var(--green); background:var(--green-bg); }
+  .hl.gd { border-color:var(--gold); background:var(--gold-bg); }
+
+  /* ── Split divider ── */
+  .vline { width:1px; background:var(--border); flex-shrink:0; }
+
+  /* ── Stat ── */
+  .stat { text-align:center; }
+  .stat-n { font-family:'Fraunces',serif; font-size:48px; color:var(--accent); line-height:1; }
+  .stat-l { font-size:12px; color:var(--muted); font-weight:500; margin-top:5px; }
+
+  /* ── Check list ── */
+  .cklist { display:flex; flex-direction:column; gap:11px; }
+  .cki { display:flex; align-items:flex-start; gap:11px; }
+  .cki-icon {
+    width:22px; height:22px; border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; flex-shrink:0; margin-top:1px;
+  }
+  .cki-t { font-size:14.5px; color:var(--ink-soft); line-height:1.5; }
+  .cki-t strong { color:var(--ink); }
+
+  /* ── Array visual ── */
+  .arr-vis {
+    display:flex; align-items:center; gap:0; border-radius:8px; overflow:hidden;
+    border:1.5px solid var(--border); width:fit-content;
+  }
+  .arr-cell {
+    padding:10px 18px; font-family:'JetBrains Mono',monospace;
+    font-size:15px; font-weight:700; border-right:1px solid var(--border);
+    text-align:center; min-width:52px;
+  }
+  .arr-cell:last-child { border-right:none; }
+  .arr-idx {
+    text-align:center; font-size:10px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace; padding-top:4px;
+    min-width:52px;
+  }
+
+  /* ── 2D array grid ── */
+  .arr2d { display:flex; flex-direction:column; gap:4px; }
+  .arr2d-row { display:flex; gap:4px; }
+  .arr2d-cell {
+    width:48px; height:40px; border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600;
+    border:1.5px solid;
+  }
+
+  /* ── Timeline ── */
+  .tl { display:flex; flex-direction:column; gap:0; }
+  .tl-i { display:flex; gap:18px; padding-bottom:20px; }
+  .tl-i:last-child { padding-bottom:0; }
+  .tl-l { display:flex; flex-direction:column; align-items:center; }
+  .tl-d {
+    width:34px; height:34px; border-radius:50%; color:white;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; flex-shrink:0; z-index:1;
+  }
+  .tl-line { width:2px; flex:1; background:var(--border); margin-top:4px; }
+  .tl-i:last-child .tl-line { display:none; }
+  .tl-c { padding-top:5px; flex:1; }
+  .tl-title { font-size:14.5px; font-weight:700; color:var(--ink); margin-bottom:2px; }
+  .tl-desc { font-size:12.5px; color:var(--muted); }
+
+  /* ── Split recommendation box ── */
+  .split-rec {
+    border-radius:14px; padding:22px 26px; border:2px dashed;
+  }
+
+  /* ── Cover panel ── */
+  .cover-panel-left { flex:1; padding:52px; display:flex; flex-direction:column; justify-content:center; }
+  .cover-panel-right {
+    width:300px; background:var(--ink); flex-shrink:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:36px; position:relative; overflow:hidden;
+  }
+  .cover-panel-right::before {
+    content:''; position:absolute;
+    width:280px; height:280px; border-radius:50%;
+    background:rgba(224,92,26,.08); top:-60px; right:-80px;
+  }
+  .cover-panel-right::after {
+    content:''; position:absolute;
+    width:180px; height:180px; border-radius:50%;
+    background:rgba(27,42,107,.15); bottom:-40px; left:-40px;
+  }
+
+  .speaker-card {
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+    border-radius:14px; padding:22px; text-align:center; z-index:1; width:100%;
+    backdrop-filter:blur(10px); margin-top:16px;
+  }
+  .speaker-card-label { color:rgba(255,255,255,.45); font-size:10px; text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
+  .speaker-card-val { color:white; font-size:16px; font-weight:700; }
+  .speaker-card-sub { color:rgba(255,255,255,.55); font-size:12px; margin-top:4px; }
+
+  .hs-logo {
+    font-family:'Fraunces',serif; font-size:22px; color:var(--accent);
+    text-align:center; margin-bottom:8px; z-index:1;
+  }
+  .hs-sub { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.4); text-align:center; margin-bottom:28px; z-index:1; }
+
+  /* ── Profile ── */
+  .prof-avatar {
+    width:90px; height:90px; border-radius:18px;
+    background:linear-gradient(135deg,var(--accent),var(--navy));
+    display:flex; align-items:center; justify-content:center;
+    font-size:38px; margin-bottom:16px; flex-shrink:0;
+  }
+
+  /* ── Video split box ── */
+  .vsplit-box {
+    border-radius:12px; padding:20px 24px; flex:1;
+  }
+  .vsplit-box.v1 { background:var(--accent-bg); border:2px solid var(--accent-mid); }
+  .vsplit-box.v2 { background:var(--navy-bg);   border:2px solid var(--navy-mid);   }
+  .vsplit-header { font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px; }
+  .vsplit-title { font-family:'Fraunces',serif; font-size:20px; margin-bottom:12px; }
+  .vsplit-dur { font-size:12px; font-weight:600; margin-bottom:14px; }
+
+  /* ── Nav ── */
+  .nav {
+    position:fixed; bottom:26px; right:32px;
+    display:flex; align-items:center; gap:10px; z-index:100;
+  }
+  .nav-btn {
+    width:42px; height:42px; border-radius:50%;
+    background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.2);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:17px; color:white;
+    backdrop-filter:blur(8px); transition:all .2s;
+  }
+  .nav-btn:hover { background:var(--accent); border-color:var(--accent); transform:scale(1.08); }
+
+  .hint { position:fixed; bottom:34px; left:50%; transform:translateX(-50%); font-size:11px; color:rgba(255,255,255,.3); font-family:'Plus Jakarta Sans'; }
+
+  /* ── Fade up ── */
+  @keyframes fu { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .slide.active .an { animation:fu .45s ease both; }
+  .slide.active .an:nth-child(1) { animation-delay:.04s; }
+  .slide.active .an:nth-child(2) { animation-delay:.13s; }
+  .slide.active .an:nth-child(3) { animation-delay:.22s; }
+  .slide.active .an:nth-child(4) { animation-delay:.30s; }
+  .slide.active .an:nth-child(5) { animation-delay:.37s; }
+  .slide.active .an:nth-child(6) { animation-delay:.43s; }
+  .slide.active .an { opacity:0; }
+
+  .sp { height:14px; }
+  code { font-family:'JetBrains Mono',monospace; background:var(--paper); padding:2px 7px; border-radius:4px; font-size:12.5px; color:var(--accent-dark); }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ══ SLIDE 01 — COVER ══════════════════════════════════════════════ -->
+<div class="slide active">
+  <div class="hstrip">
+    <div class="hstrip-left">
+      <div class="module-badge">Module 1</div>
+      <div class="hstrip-title">NumPy — Numerical Computing in Python</div>
+    </div>
+    <div class="hstrip-right">
+      <div class="video-tag v1">Video A</div>
+      <div class="video-tag v2">Video B</div>
+      <div class="slide-num">01 / 20</div>
+    </div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:5%"></div></div>
+  <div class="body split no-pad">
+    <div class="cover-panel-left">
+      <div class="eyebrow an">Module 1 of 7 · Data Science Fundamentals</div>
+      <h1 class="cover-title an">NumPy —<br>The <em>Engine</em> Behind<br>Data Science</h1>
+      <p class="lead an">Arrays, broadcasting, vectorised operations, and the random module — the numerical backbone that powers NumPy, Pandas, and every ML library in Python.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:24px" class="an">
+        <div class="chip or">⚡ 100× Faster than Lists</div>
+        <div class="chip nv">📐 N-Dimensional Arrays</div>
+        <div class="chip tl">📡 Broadcasting</div>
+        <div class="chip gn">🎲 Random Module</div>
+      </div>
+      <div style="margin-top:28px;padding-top:22px;border-top:1px solid var(--border);display:flex;gap:28px" class="an">
+        <div class="stat"><div class="stat-n">2</div><div class="stat-l">Videos</div></div>
+        <div class="stat"><div class="stat-n">60</div><div class="stat-l">Minutes Total</div></div>
+        <div class="stat"><div class="stat-n">8</div><div class="stat-l">Core Concepts</div></div>
+      </div>
+    </div>
+    <div class="cover-panel-right">
+      <div class="hs-logo">⚡ HackSkill</div>
+      <div class="hs-sub">hackskill.in</div>
+      <div class="speaker-card">
+        <div class="speaker-card-label">Speaker</div>
+        <div class="speaker-card-val">Aditya Srivastava</div>
+        <div class="speaker-card-sub">Founder, HackSkill<br>Oracle Certified Cloud Associate</div>
+      </div>
+      <div class="speaker-card" style="margin-top:10px">
+        <div class="speaker-card-label">Workshop</div>
+        <div class="speaker-card-val">23 Mar – 7 Apr</div>
+        <div class="speaker-card-sub">Free · Self-Paced · Certified</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 02 — VIDEO SPLIT RECOMMENDATION ════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Video Split Strategy</div></div>
+    <div class="hstrip-right"><div class="slide-num">02 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:10%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">Production Decision</div>
+    <h2 class="sec an">Split into <em>2 Videos</em> — Here's Why</h2>
+    <div class="g2 an" style="gap:20px;margin-bottom:20px">
+      <div class="vsplit-box v1">
+        <div class="vsplit-header" style="color:var(--accent)">📹 Video A — NumPy Basics</div>
+        <div class="vsplit-title" style="color:var(--accent-dark)">Arrays, Attributes &amp; Slicing</div>
+        <div class="vsplit-dur" style="color:var(--accent)">⏱ ~28 minutes</div>
+        <div style="font-size:13px;color:var(--ink-soft);line-height:1.8">
+          ✦ Why NumPy? Speed benchmark<br>
+          ✦ Creating arrays (6 methods)<br>
+          ✦ Shape, dtype, ndim, size<br>
+          ✦ 1D & 2D Indexing<br>
+          ✦ Slicing & Boolean Masking<br>
+          ✦ Live Colab demo + exercise
+        </div>
+      </div>
+      <div class="vsplit-box v2">
+        <div class="vsplit-header" style="color:var(--navy)">📹 Video B — NumPy Power</div>
+        <div class="vsplit-title" style="color:var(--navy)">Operations, Broadcasting & Random</div>
+        <div class="vsplit-dur" style="color:var(--navy)">⏱ ~32 minutes</div>
+        <div style="font-size:13px;color:var(--ink-soft);line-height:1.8">
+          ✦ Vectorised math operations<br>
+          ✦ Broadcasting — the big idea<br>
+          ✦ Aggregations (sum, mean, std)<br>
+          ✦ Reshape, flatten, transpose<br>
+          ✦ Random module & seeding<br>
+          ✦ Mini-project: Student analytics
+        </div>
+      </div>
+    </div>
+    <div class="hl an">
+      <strong>Why split?</strong> YouTube analytics show 60–70% drop-off on tutorials longer than 25 minutes. Two focused videos keep learners engaged, make rewatching easier, and help the algorithm recommend each video independently — doubling your channel's reach for this module.
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 03 — ABOUT ADITYA ══════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Speaker Introduction</div></div>
+    <div class="hstrip-right"><div class="video-tag v1">Video A · 0:00</div><div class="slide-num">03 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:15%"></div></div>
+  <div class="body split">
+    <div style="width:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+      <div class="prof-avatar an">👨‍💼</div>
+      <div style="text-align:center" class="an">
+        <div style="font-family:'Fraunces',serif;font-size:26px;color:var(--ink)">Aditya Srivastava</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">Founder · HackSkill</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;width:100%" class="an">
+        <div class="chip or" style="justify-content:center;padding:10px">⚡ Founder, HackSkill</div>
+        <div class="chip nv" style="justify-content:center;padding:10px">☁️ Oracle Certified Cloud Associate</div>
+        <div class="chip tl" style="justify-content:center;padding:10px">🌐 hackskill.in</div>
+      </div>
+    </div>
+    <div class="vline"></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+      <div class="eyebrow an">Your Instructor</div>
+      <h2 class="sec an">Building communities<br>that <em>build careers</em></h2>
+      <div style="display:flex;flex-direction:column;gap:11px" class="an">
+        <div class="cki"><div class="cki-icon" style="background:var(--accent-bg);color:var(--accent)">⚡</div><div class="cki-t"><strong>Founded HackSkill</strong> — a platform making industry-level tech education free and accessible across India</div></div>
+        <div class="cki"><div class="cki-icon" style="background:var(--navy-bg);color:var(--navy)">☁️</div><div class="cki-t"><strong>Oracle Certified Cloud Associate</strong> — certified in cloud infrastructure, architecture, and deployment</div></div>
+        <div class="cki"><div class="cki-icon" style="background:var(--teal-bg);color:var(--teal)">📊</div><div class="cki-t"><strong>Data & Cloud practitioner</strong> — real-world experience building data-driven systems and platforms</div></div>
+        <div class="cki"><div class="cki-icon" style="background:var(--green-bg);color:var(--green)">🎓</div><div class="cki-t"><strong>Educator first</strong> — designed this entire workshop curriculum to bridge the gap between college and industry</div></div>
+      </div>
+      <div class="hl an" style="margin-top:18px">
+        <em>"I built HackSkill because I know what it feels like to search for quality resources and come up empty. This workshop is what I wish I had."</em>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 04 — WHY NUMPY ══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Why NumPy Exists</div></div>
+    <div class="hstrip-right"><div class="video-tag v1">Video A · 2:30</div><div class="slide-num">04 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:20%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">The Motivation</div>
+    <h2 class="sec an">Python lists are <em>too slow</em> for data science</h2>
+    <div class="g2 an" style="gap:20px;margin-bottom:20px">
+      <div class="card" style="border-color:#fecaca;background:#fff5f5">
+        <div class="card-label" style="color:#dc2626">❌ Python List — Slow</div>
+        <div class="code" style="font-size:12px;margin-top:8px">
+          <span class="kw">import</span> time
+          <br>lst = <span class="fn">list</span>(<span class="fn">range</span>(<span class="nm">1_000_000</span>))
+          <br>t = time.time()
+          <br>result = [x*<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> lst]
+          <br><span class="fn">print</span>(<span class="fn">round</span>(time.time()-t, <span class="nm">4</span>), <span class="st">'sec'</span>)
+          <br><span class="out"># ≈ 0.12 seconds</span>
+        </div>
+      </div>
+      <div class="card" style="border-color:var(--green-mid);background:var(--green-bg)">
+        <div class="card-label" style="color:var(--green)">✅ NumPy Array — Fast</div>
+        <div class="code" style="font-size:12px;margin-top:8px">
+          <span class="kw">import</span> numpy <span class="kw">as</span> np
+          <br>arr = np.array(lst)
+          <br>t = time.time()
+          <br>result = arr * <span class="nm">2</span>
+          <br><span class="fn">print</span>(<span class="fn">round</span>(time.time()-t, <span class="nm">4</span>), <span class="st">'sec'</span>)
+          <br><span class="out"># ≈ 0.001 seconds  🚀</span>
+        </div>
+      </div>
+    </div>
+    <div class="g3 an" style="gap:14px">
+      <div class="card">
+        <div class="card-label" style="color:var(--accent)">🧠 Why So Fast?</div>
+        <div class="body-t">NumPy stores data in contiguous memory blocks and uses compiled C code — no Python overhead per element.</div>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--navy)">🔒 Fixed Type</div>
+        <div class="body-t">Every element is the same type (e.g. float64). No type-checking per operation — pure speed.</div>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--teal)">📦 The Foundation</div>
+        <div class="body-t">Pandas, Matplotlib, Seaborn, Scikit-learn — they all use NumPy arrays internally.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 05 — CREATING ARRAYS ════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Creating Arrays</div></div>
+    <div class="hstrip-right"><div class="video-tag v1">Video A · 6:00</div><div class="slide-num">05 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:25%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">Array Creation</div>
+    <h2 class="sec an">6 Ways to Create a <em>NumPy Array</em></h2>
+    <div class="code an" style="margin-bottom:18px;font-size:12.5px">
+      <span class="code-label">Python · Colab</span>
+      <span class="kw">import</span> numpy <span class="kw">as</span> np<br><br>
+      <span class="cm"># 1. From a Python list</span><br>
+      a1 = np.<span class="fn">array</span>([<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>, <span class="nm">40</span>, <span class="nm">50</span>])<br><br>
+      <span class="cm"># 2. Zeros / Ones / Full</span><br>
+      a2 = np.<span class="fn">zeros</span>((<span class="nm">3</span>, <span class="nm">4</span>))      <span class="cm"># 3 rows, 4 cols of 0.0</span><br>
+      a3 = np.<span class="fn">ones</span>((<span class="nm">2</span>, <span class="nm">3</span>))       <span class="cm"># 2 rows, 3 cols of 1.0</span><br>
+      a4 = np.<span class="fn">full</span>((<span class="nm">2</span>, <span class="nm">2</span>), <span class="nm">7</span>)    <span class="cm"># 2×2 filled with 7</span><br><br>
+      <span class="cm"># 3. Range-based</span><br>
+      a5 = np.<span class="fn">arange</span>(<span class="nm">0</span>, <span class="nm">20</span>, <span class="nm">2</span>)    <span class="cm"># [0, 2, 4, … 18]  (step=2)</span><br>
+      a6 = np.<span class="fn">linspace</span>(<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">5</span>)  <span class="cm"># [0.0, 0.25, 0.5, 0.75, 1.0]</span><br><br>
+      <span class="cm"># 4. Identity matrix</span><br>
+      a7 = np.<span class="fn">eye</span>(<span class="nm">3</span>)               <span class="cm"># 3×3 identity matrix</span>
+    </div>
+    <div class="g2 an" style="gap:14px">
+      <div class="hl nv" style="margin:0"><strong>arange</strong> vs <strong>linspace</strong>: Use <code>arange</code> when you know the <em>step size</em>. Use <code>linspace</code> when you know how many <em>points</em> you want.</div>
+      <div class="hl gn" style="margin:0"><strong>zeros / ones</strong> are commonly used to initialise arrays before filling them — a pattern you'll see often in ML algorithms.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 06 — ARRAY ATTRIBUTES ══════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Array Attributes</div></div>
+    <div class="hstrip-right"><div class="video-tag v1">Video A · 10:00</div><div class="slide-num">06 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:30%"></div></div>
+  <div class="body split">
+    <div style="flex:1">
+      <div class="eyebrow an">Know Your Array</div>
+      <h2 class="sec an">The 4 <em>Essential Attributes</em></h2>
+      <div class="code an" style="font-size:12.5px">
+        <span class="code-label">Python · Colab</span>
+        arr = np.<span class="fn">array</span>([[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>],[<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>]])<br><br>
+        <span class="fn">print</span>(arr.<span class="op">shape</span>)   <span class="cm"># (2, 3)    ← rows, cols</span><br>
+        <span class="fn">print</span>(arr.<span class="op">ndim</span>)    <span class="cm"># 2         ← 2-dimensional</span><br>
+        <span class="fn">print</span>(arr.<span class="op">size</span>)    <span class="cm"># 6         ← total elements</span><br>
+        <span class="fn">print</span>(arr.<span class="op">dtype</span>)   <span class="cm"># int64     ← data type</span><br><br>
+        <span class="cm"># Changing dtype</span><br>
+        arr_f = arr.<span class="fn">astype</span>(<span class="op">float</span>)<br>
+        <span class="fn">print</span>(arr_f.<span class="op">dtype</span>) <span class="cm"># float64</span>
+      </div>
+      <div class="hl an" style="margin-top:14px"><strong>Always check .shape first</strong> when working with a new dataset. A shape mismatch is the #1 source of NumPy errors in ML code.</div>
+    </div>
+    <div style="width:270px;display:flex;flex-direction:column;justify-content:center;gap:14px" class="an">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Visual: arr.shape = (2, 3)</div>
+      <div class="arr2d">
+        <div class="arr2d-row">
+          <div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">1</div>
+          <div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">2</div>
+          <div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">3</div>
+        </div>
+        <div class="arr2d-row">
+          <div class="arr2d-cell" style="background:var(--navy-bg);border-color:var(--navy-mid);color:var(--navy)">4</div>
+          <div class="arr2d-cell" style="background:var(--navy-bg);border-color:var(--navy-mid);color:var(--navy)">5</div>
+          <div class="arr2d-cell" style="background:var(--navy-bg);border-color:var(--navy-mid);color:var(--navy)">6</div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px"><span>← 3 columns →</span></div>
+        <div class="card" style="font-size:13px;line-height:2">
+          <span style="color:var(--accent)">shape</span> → <code>(2, 3)</code><br>
+          <span style="color:var(--navy)">ndim</span>  → <code>2</code><br>
+          <span style="color:var(--teal)">size</span>  → <code>6</code><br>
+          <span style="color:var(--green)">dtype</span> → <code>int64</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 07 — INDEXING & SLICING ════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Indexing & Slicing</div></div>
+    <div class="hstrip-right"><div class="video-tag v1">Video A · 13:30</div><div class="slide-num">07 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:35%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">Accessing Data</div>
+    <h2 class="sec an">Indexing, Slicing &amp; <em>Boolean Masking</em></h2>
+    <div class="g2 an" style="gap:18px">
+      <div>
+        <div class="hl" style="margin-bottom:12px"><strong>1D Array</strong> — just like Python lists, zero-indexed</div>
+        <div class="code" style="font-size:12px">
+          a = np.<span class="fn">array</span>([<span class="nm">10</span>,<span class="nm">20</span>,<span class="nm">30</span>,<span class="nm">40</span>,<span class="nm">50</span>])<br>
+          <span class="fn">print</span>(a[<span class="nm">0</span>])      <span class="cm"># 10</span><br>
+          <span class="fn">print</span>(a[-<span class="nm">1</span>])     <span class="cm"># 50  (last item)</span><br>
+          <span class="fn">print</span>(a[<span class="nm">1</span>:<span class="nm">4</span>])    <span class="cm"># [20 30 40]</span><br>
+          <span class="fn">print</span>(a[::<span class="nm">2</span>])    <span class="cm"># [10 30 50]  every 2nd</span>
+        </div>
+      </div>
+      <div>
+        <div class="hl nv" style="margin-bottom:12px"><strong>2D Array</strong> — [row, column] indexing</div>
+        <div class="code" style="font-size:12px">
+          m = np.<span class="fn">array</span>([[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>],[<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>],[<span class="nm">7</span>,<span class="nm">8</span>,<span class="nm">9</span>]])<br>
+          <span class="fn">print</span>(m[<span class="nm">0</span>, <span class="nm">1</span>])    <span class="cm"># 2   (row 0, col 1)</span><br>
+          <span class="fn">print</span>(m[<span class="nm">1</span>, :])    <span class="cm"># [4 5 6]  (entire row 1)</span><br>
+          <span class="fn">print</span>(m[:, <span class="nm">2</span>])    <span class="cm"># [3 6 9]  (entire col 2)</span><br>
+          <span class="fn">print</span>(m[<span class="nm">1</span>:, <span class="nm">1</span>:])  <span class="cm"># bottom-right 2×2</span>
+        </div>
+      </div>
+    </div>
+    <div class="sp"></div>
+    <div class="hl tl an"><strong>Boolean Masking</strong> — the most powerful data filtering technique in NumPy (and Pandas)</div>
+    <div class="code an" style="font-size:12.5px">
+      scores = np.<span class="fn">array</span>([<span class="nm">88</span>, <span class="nm">45</span>, <span class="nm">92</span>, <span class="nm">34</span>, <span class="nm">77</span>, <span class="nm">61</span>])<br>
+      mask   = scores >= <span class="nm">60</span>                          <span class="cm"># → [True, False, True, False, True, True]</span><br>
+      passing = scores[mask]                           <span class="cm"># → [88, 92, 77, 61]</span><br>
+      <span class="cm"># One-liner:</span><br>
+      passing = scores[scores >= <span class="nm">60</span>]                  <span class="cm"># same result ✓</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 08 — COLAB SWITCH / VIDEO A ════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Live Demo — Video A</div></div>
+    <div class="hstrip-right"><div class="video-tag v1">Video A · Switch to Colab</div><div class="slide-num">08 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:40%"></div></div>
+  <div class="body center">
+    <div style="max-width:560px">
+      <div style="font-size:60px;margin-bottom:20px" class="an">💻</div>
+      <div class="eyebrow an" style="justify-content:center">Switching to Google Colab</div>
+      <h2 class="sec an" style="text-align:center">Live <em>Coding Demo</em> — Video A</h2>
+      <p class="lead an" style="text-align:center;max-width:480px;margin:0 auto 24px">We now switch to Colab and build everything from scratch — speed benchmark, all 6 creation methods, attributes, indexing, slicing, and Boolean masking.</p>
+      <div class="g2 an" style="gap:10px;max-width:480px;margin:0 auto">
+        <div class="chip or" style="justify-content:center;padding:12px">⚡ Speed Benchmark</div>
+        <div class="chip nv" style="justify-content:center;padding:12px">📐 6 Creation Methods</div>
+        <div class="chip tl" style="justify-content:center;padding:12px">🔬 Shape & Attributes</div>
+        <div class="chip gn" style="justify-content:center;padding:12px">🎯 Boolean Masking</div>
+      </div>
+      <div class="hl an" style="margin-top:22px;max-width:480px;margin-left:auto;margin-right:auto">
+        <strong>Video A Exercise:</strong> Create a 4×3 array of random integers (0–100). Find the mean of each row. Filter out all values below 50.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 09 — VIDEO B COVER ══════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Video B — NumPy Power Features</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · Start</div><div class="slide-num">09 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:45%"></div></div>
+  <div class="body center">
+    <div style="max-width:620px">
+      <div class="eyebrow an" style="justify-content:center">Module 1 · Video B</div>
+      <h1 class="cover-title an" style="font-size:clamp(30px,3.5vw,48px)">NumPy <em>Power Features</em><br>Operations, Broadcasting & Random</h1>
+      <p class="lead an" style="text-align:center;margin:0 auto 28px">Welcome back! If Video A was about understanding arrays, Video B is about making them do powerful things. This is where NumPy gets truly exciting.</p>
+      <div class="g2 an" style="gap:12px;max-width:500px;margin:0 auto">
+        <div class="chip or" style="justify-content:center;padding:12px 16px">➕ Vectorised Operations</div>
+        <div class="chip nv" style="justify-content:center;padding:12px 16px">📡 Broadcasting</div>
+        <div class="chip tl" style="justify-content:center;padding:12px 16px">📊 Aggregations</div>
+        <div class="chip gn" style="justify-content:center;padding:12px 16px">🔄 Reshape & Transpose</div>
+        <div class="chip gd" style="justify-content:center;padding:12px 16px">🎲 Random Module</div>
+        <div class="chip rb" style="justify-content:center;padding:12px 16px">🏆 Mini Project</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 10 — VECTORISED OPERATIONS ═════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Vectorised Operations</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · 2:00</div><div class="slide-num">10 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:50%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">No Loops Needed</div>
+    <h2 class="sec an">Vectorised <em>Math Operations</em></h2>
+    <div class="code an" style="margin-bottom:18px;font-size:12.5px">
+      <span class="code-label">Python · Colab</span>
+      a = np.<span class="fn">array</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>])<br>
+      b = np.<span class="fn">array</span>([<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>, <span class="nm">40</span>, <span class="nm">50</span>])<br><br>
+      <span class="cm"># Element-wise arithmetic — NO loop needed</span><br>
+      <span class="fn">print</span>(a + b)       <span class="cm"># [11 22 33 44 55]</span><br>
+      <span class="fn">print</span>(a * b)       <span class="cm"># [10 40 90 160 250]</span><br>
+      <span class="fn">print</span>(b / a)       <span class="cm"># [10. 10. 10. 10. 10.]</span><br>
+      <span class="fn">print</span>(a ** <span class="nm">2</span>)     <span class="cm"># [ 1  4  9 16 25]</span><br><br>
+      <span class="cm"># Universal functions (ufuncs)</span><br>
+      <span class="fn">print</span>(np.<span class="fn">sqrt</span>(a))  <span class="cm"># [1. 1.41 1.73 2.  2.24]</span><br>
+      <span class="fn">print</span>(np.<span class="fn">exp</span>(a))   <span class="cm"># [e¹ e² e³ e⁴ e⁵]</span><br>
+      <span class="fn">print</span>(np.<span class="fn">log</span>(b))   <span class="cm"># natural log of each element</span><br><br>
+      <span class="cm"># Dot product (matrix multiply)</span><br>
+      <span class="fn">print</span>(np.<span class="fn">dot</span>(a, b))  <span class="cm"># 550  (scalar result)</span>
+    </div>
+    <div class="g2 an" style="gap:14px">
+      <div class="hl" style="margin:0"><strong>Vectorisation</strong> = applying an operation to all elements simultaneously. No Python for-loop. This is what makes NumPy fast enough for deep learning.</div>
+      <div class="hl nv" style="margin:0"><strong>ufuncs</strong> (universal functions) like <code>np.sqrt</code>, <code>np.sin</code>, <code>np.log</code> operate element-wise and are implemented in C — lightning fast.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 11 — BROADCASTING ══════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Broadcasting</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · 8:00</div><div class="slide-num">11 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:55%"></div></div>
+  <div class="body split">
+    <div style="flex:1">
+      <div class="eyebrow an">The Big Idea</div>
+      <h2 class="sec an">Broadcasting — <em>Shape-flexible</em> operations</h2>
+      <p class="body-t an" style="margin-bottom:16px">Broadcasting lets NumPy do math on arrays of different shapes by automatically "stretching" the smaller array to match the larger one — without copying memory.</p>
+      <div class="code an" style="font-size:12px;margin-bottom:14px">
+        <span class="code-label">Python · Colab</span>
+        <span class="cm"># Adding a 1D array to a 2D array</span><br>
+        A = np.<span class="fn">array</span>([[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>],<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>]])   <span class="cm"># shape (2,3)</span><br>
+        b = np.<span class="fn">array</span>([<span class="nm">10</span>,<span class="nm">20</span>,<span class="nm">30</span>])     <span class="cm"># shape (3,)</span><br><br>
+        <span class="fn">print</span>(A + b)<br>
+        <span class="cm"># [[11 22 33]</span><br>
+        <span class="cm">#  [14 25 36]]</span><br><br>
+        <span class="cm"># Real use: normalise each column</span><br>
+        col_means = A.<span class="fn">mean</span>(axis=<span class="nm">0</span>)   <span class="cm"># [2.5, 3.5, 4.5]</span><br>
+        normalised = A - col_means     <span class="cm"># broadcasts!</span>
+      </div>
+      <div class="hl tl an" style="margin:0"><strong>Broadcasting Rule:</strong> Two shapes are compatible if, reading from right to left, each dimension is either equal or one of them is 1.</div>
+    </div>
+    <div style="width:250px;display:flex;flex-direction:column;justify-content:center;gap:14px" class="an">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px">How Broadcasting Works</div>
+      <div class="arr2d" style="gap:3px">
+        <div style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px">A — shape (2,3)</div>
+        <div class="arr2d-row"><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">1</div><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">2</div><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">3</div></div>
+        <div class="arr2d-row"><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">4</div><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">5</div><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent)">6</div></div>
+      </div>
+      <div style="font-size:18px;text-align:center;color:var(--muted)">+</div>
+      <div>
+        <div style="font-size:10px;color:var(--navy);font-weight:700;margin-bottom:4px">b — shape (3,) → stretched</div>
+        <div class="arr-vis"><div class="arr-cell" style="background:var(--navy-bg);color:var(--navy)">10</div><div class="arr-cell" style="background:var(--navy-bg);color:var(--navy)">20</div><div class="arr-cell" style="background:var(--navy-bg);color:var(--navy)">30</div></div>
+      </div>
+      <div style="font-size:18px;text-align:center;color:var(--muted)">=</div>
+      <div>
+        <div style="font-size:10px;color:var(--teal);font-weight:700;margin-bottom:4px">Result — shape (2,3)</div>
+        <div class="arr2d" style="gap:3px">
+          <div class="arr2d-row"><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal)">11</div><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal)">22</div><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal)">33</div></div>
+          <div class="arr2d-row"><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal)">14</div><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal)">25</div><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal)">36</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 12 — AGGREGATIONS ══════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Aggregations & Axis</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · 14:00</div><div class="slide-num">12 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:60%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">Summarising Data</div>
+    <h2 class="sec an">Aggregations &amp; the <em>Axis Parameter</em></h2>
+    <div class="g2 an" style="gap:18px">
+      <div>
+        <div class="hl" style="margin-bottom:12px"><strong>Common Aggregation Functions</strong></div>
+        <div class="code" style="font-size:12px">
+          a = np.<span class="fn">array</span>([[<span class="nm">4</span>,<span class="nm">8</span>,<span class="nm">2</span>],[<span class="nm">6</span>,<span class="nm">1</span>,<span class="nm">9</span>]])<br><br>
+          np.<span class="fn">sum</span>(a)       <span class="cm"># 30    (all elements)</span><br>
+          np.<span class="fn">mean</span>(a)      <span class="cm"># 5.0</span><br>
+          np.<span class="fn">std</span>(a)       <span class="cm"># 2.94  (std deviation)</span><br>
+          np.<span class="fn">min</span>(a)       <span class="cm"># 1</span><br>
+          np.<span class="fn">max</span>(a)       <span class="cm"># 9</span><br>
+          np.<span class="fn">argmax</span>(a)    <span class="cm"># 5     (flat index of max)</span><br>
+          np.<span class="fn">cumsum</span>(a)    <span class="cm"># cumulative sum</span>
+        </div>
+      </div>
+      <div>
+        <div class="hl nv" style="margin-bottom:12px"><strong>axis=0</strong> → down rows (column-wise) | <strong>axis=1</strong> → across columns (row-wise)</div>
+        <div class="code" style="font-size:12px">
+          <span class="cm"># axis=0 → collapse rows → one value per COLUMN</span><br>
+          np.<span class="fn">sum</span>(a, axis=<span class="nm">0</span>)    <span class="cm"># [10  9 11]</span><br>
+          np.<span class="fn">mean</span>(a, axis=<span class="nm">0</span>)   <span class="cm"># [5.  4.5  5.5]</span><br><br>
+          <span class="cm"># axis=1 → collapse cols → one value per ROW</span><br>
+          np.<span class="fn">sum</span>(a, axis=<span class="nm">1</span>)    <span class="cm"># [14  16]</span><br>
+          np.<span class="fn">mean</span>(a, axis=<span class="nm">1</span>)   <span class="cm"># [4.67  5.33]</span><br><br>
+          <span class="cm"># Real use: student average per subject vs per student</span><br>
+          scores = np.random.randint(<span class="nm">50</span>,<span class="nm">100</span>, (<span class="nm">30</span>,<span class="nm">5</span>))<br>
+          student_avg = scores.mean(axis=<span class="nm">1</span>)  <span class="cm"># 30 values</span><br>
+          subject_avg = scores.mean(axis=<span class="nm">0</span>)  <span class="cm"># 5 values</span>
+        </div>
+      </div>
+    </div>
+    <div class="hl gd an" style="margin-top:14px"><strong>Memory trick:</strong> axis=0 "collapses rows" (result has same number of columns). axis=1 "collapses columns" (result has same number of rows).</div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 13 — RESHAPE & TRANSPOSE ══════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Reshape & Transpose</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · 18:30</div><div class="slide-num">13 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:65%"></div></div>
+  <div class="body split">
+    <div style="flex:1">
+      <div class="eyebrow an">Shape Manipulation</div>
+      <h2 class="sec an">Reshape, Flatten<br>&amp; <em>Transpose</em></h2>
+      <div class="code an" style="font-size:12.5px">
+        <span class="code-label">Python · Colab</span>
+        a = np.<span class="fn">arange</span>(<span class="nm">12</span>)         <span class="cm"># [0,1,2,...,11]</span><br><br>
+        <span class="cm"># reshape — total elements must stay same</span><br>
+        b = a.<span class="fn">reshape</span>(<span class="nm">3</span>, <span class="nm">4</span>)      <span class="cm"># 3 rows × 4 cols</span><br>
+        c = a.<span class="fn">reshape</span>(<span class="nm">2</span>, <span class="nm">2</span>, <span class="nm">3</span>)   <span class="cm"># 3D array!</span><br>
+        d = a.<span class="fn">reshape</span>(-<span class="nm">1</span>, <span class="nm">4</span>)     <span class="cm"># -1 = auto-infer rows</span><br><br>
+        <span class="cm"># flatten → always returns 1D copy</span><br>
+        flat = b.<span class="fn">flatten</span>()         <span class="cm"># [0 1 2 3 4 5 ...]</span><br><br>
+        <span class="cm"># transpose — flip rows and columns</span><br>
+        b_T = b.T                    <span class="cm"># shape (3,4) → (4,3)</span><br>
+        <span class="fn">print</span>(b.shape)               <span class="cm"># (3, 4)</span><br>
+        <span class="fn">print</span>(b_T.shape)             <span class="cm"># (4, 3)</span>
+      </div>
+      <div class="hl tl an" style="margin-top:14px">Use <code>reshape(-1, n)</code> constantly in ML — when you need to go from a 1D prediction array to a column vector for scikit-learn.</div>
+    </div>
+    <div style="width:240px;display:flex;flex-direction:column;justify-content:center;gap:16px" class="an">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">arange(12).reshape(3,4)</div>
+      <div class="arr2d" style="gap:3px">
+        <div class="arr2d-row">
+          <div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent);width:44px;height:36px;font-size:12px">0</div><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent);width:44px;height:36px;font-size:12px">1</div><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent);width:44px;height:36px;font-size:12px">2</div><div class="arr2d-cell" style="background:var(--accent-bg);border-color:var(--accent-mid);color:var(--accent);width:44px;height:36px;font-size:12px">3</div>
+        </div>
+        <div class="arr2d-row">
+          <div class="arr2d-cell" style="background:var(--navy-bg);border-color:var(--navy-mid);color:var(--navy);width:44px;height:36px;font-size:12px">4</div><div class="arr2d-cell" style="background:var(--navy-bg);border-color:var(--navy-mid);color:var(--navy);width:44px;height:36px;font-size:12px">5</div><div class="arr2d-cell" style="background:var(--navy-bg);border-color:var(--navy-mid);color:var(--navy);width:44px;height:36px;font-size:12px">6</div><div class="arr2d-cell" style="background:var(--navy-bg);border-color:var(--navy-mid);color:var(--navy);width:44px;height:36px;font-size:12px">7</div>
+        </div>
+        <div class="arr2d-row">
+          <div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal);width:44px;height:36px;font-size:12px">8</div><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal);width:44px;height:36px;font-size:12px">9</div><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal);width:44px;height:36px;font-size:12px">10</div><div class="arr2d-cell" style="background:var(--teal-bg);border-color:var(--teal-mid);color:var(--teal);width:44px;height:36px;font-size:12px">11</div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:22px;color:var(--muted)">⤵ .T</div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">After Transpose (4,3)</div>
+      <div class="card" style="font-size:12px;font-family:'JetBrains Mono',monospace;line-height:2;color:var(--ink-mid)">
+        [[0 4 8]<br>
+        &nbsp;[1 5 9]<br>
+        &nbsp;[2 6 10]<br>
+        &nbsp;[3 7 11]]
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 14 — RANDOM MODULE ══════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Random Module</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · 22:00</div><div class="slide-num">14 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:70%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">Simulating Data</div>
+    <h2 class="sec an">The <em>Random Module</em> — simulate anything</h2>
+    <div class="g2 an" style="gap:18px;margin-bottom:16px">
+      <div class="code" style="font-size:12px">
+        <span class="code-label">Core Functions</span>
+        <span class="cm"># Always set a seed for reproducibility!</span><br>
+        np.random.<span class="fn">seed</span>(<span class="nm">42</span>)<br><br>
+        <span class="cm"># Uniform: floats between 0.0 and 1.0</span><br>
+        np.random.<span class="fn">rand</span>(<span class="nm">3</span>, <span class="nm">4</span>)<br><br>
+        <span class="cm"># Normal distribution: mean=0, std=1</span><br>
+        np.random.<span class="fn">randn</span>(<span class="nm">1000</span>)<br><br>
+        <span class="cm"># Random integers: low ≤ x < high</span><br>
+        np.random.<span class="fn">randint</span>(<span class="nm">0</span>, <span class="nm">100</span>, size=(<span class="nm">5</span>,<span class="nm">5</span>))<br><br>
+        <span class="cm"># Random choice from array</span><br>
+        np.random.<span class="fn">choice</span>([<span class="st">'A'</span>,<span class="st">'B'</span>,<span class="st">'C'</span>], size=<span class="nm">10</span>)
+      </div>
+      <div class="code" style="font-size:12px">
+        <span class="code-label">Real Use Case</span>
+        <span class="cm"># Simulate exam scores (normal distribution)</span><br>
+        np.random.<span class="fn">seed</span>(<span class="nm">42</span>)<br>
+        scores = np.random.<span class="fn">normal</span>(<br>
+        &nbsp;&nbsp;loc=<span class="nm">65</span>,     <span class="cm"># mean score</span><br>
+        &nbsp;&nbsp;scale=<span class="nm">15</span>,   <span class="cm"># std deviation</span><br>
+        &nbsp;&nbsp;size=<span class="nm">500</span>    <span class="cm"># 500 students</span><br>
+        )<br>
+        scores = np.<span class="fn">clip</span>(scores, <span class="nm">0</span>, <span class="nm">100</span>)<br><br>
+        <span class="fn">print</span>(<span class="st">f'Mean: {scores.mean():.1f}'</span>)<br>
+        <span class="fn">print</span>(<span class="st">f'Std:  {scores.std():.1f}'</span>)<br>
+        <span class="fn">print</span>(<span class="st">f'Pass rate: {(scores>=40).mean()*100:.1f}%'</span>)
+      </div>
+    </div>
+    <div class="g2 an" style="gap:14px">
+      <div class="hl" style="margin:0"><strong>np.random.seed(42)</strong> — Always set this at the top of any notebook with random data. It guarantees the same results every time you run, making your work reproducible.</div>
+      <div class="hl nv" style="margin:0"><strong>randn vs rand:</strong> <code>rand</code> gives uniform (0–1). <code>randn</code> gives standard normal (bell curve). Use <code>randn</code> whenever you're simulating real-world measurements.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 15 — MINI PROJECT ══════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Mini Project — Student Analytics</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · 26:00</div><div class="slide-num">15 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:75%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">Putting It All Together</div>
+    <h2 class="sec an">Mini Project: <em>Student Score Analytics</em></h2>
+    <div class="code an" style="font-size:12px;margin-bottom:14px">
+      <span class="code-label">Python · Colab — Full Project</span>
+      np.random.<span class="fn">seed</span>(<span class="nm">42</span>)<br>
+      <span class="cm"># 30 students, 5 subjects (Maths, Science, English, History, CS)</span><br>
+      scores = np.random.<span class="fn">randint</span>(<span class="nm">40</span>, <span class="nm">100</span>, size=(<span class="nm">30</span>, <span class="nm">5</span>))<br>
+      subjects = [<span class="st">'Maths'</span>, <span class="st">'Science'</span>, <span class="st">'English'</span>, <span class="st">'History'</span>, <span class="st">'CS'</span>]<br><br>
+      <span class="cm"># Q1: Average score per student</span><br>
+      student_avg = scores.<span class="fn">mean</span>(axis=<span class="nm">1</span>)<br>
+      <span class="fn">print</span>(<span class="st">f'Top student avg: {student_avg.max():.1f}'</span>)<br><br>
+      <span class="cm"># Q2: Average score per subject</span><br>
+      subject_avg = scores.<span class="fn">mean</span>(axis=<span class="nm">0</span>)<br>
+      hardest = subjects[subject_avg.<span class="fn">argmin</span>()]<br>
+      <span class="fn">print</span>(<span class="st">f'Hardest subject: {hardest}'</span>)<br><br>
+      <span class="cm"># Q3: Students who passed all subjects (>=50)</span><br>
+      passed_all = (scores >= <span class="nm">50</span>).<span class="fn">all</span>(axis=<span class="nm">1</span>)<br>
+      <span class="fn">print</span>(<span class="st">f'Passed all: {passed_all.sum()} out of 30'</span>)<br><br>
+      <span class="cm"># Q4: Normalise scores to 0-1 range</span><br>
+      scores_norm = (scores - scores.<span class="fn">min</span>()) / (scores.<span class="fn">max</span>() - scores.<span class="fn">min</span>())
+    </div>
+    <div class="g3 an" style="gap:12px">
+      <div class="chip or" style="justify-content:center;padding:11px">Uses: axis parameter</div>
+      <div class="chip nv" style="justify-content:center;padding:11px">Uses: Boolean masking</div>
+      <div class="chip tl" style="justify-content:center;padding:11px">Uses: argmin / argmax</div>
+      <div class="chip gn" style="justify-content:center;padding:11px">Uses: .all() / .any()</div>
+      <div class="chip gd" style="justify-content:center;padding:11px">Uses: Normalisation</div>
+      <div class="chip rb" style="justify-content:center;padding:11px">Uses: Broadcasting</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 16 — COLAB SWITCH B ════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Live Demo — Video B</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · Switch to Colab</div><div class="slide-num">16 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:80%"></div></div>
+  <div class="body center">
+    <div style="max-width:540px">
+      <div style="font-size:58px;margin-bottom:20px" class="an">💻</div>
+      <div class="eyebrow an" style="justify-content:center">Live Coding — Video B</div>
+      <h2 class="sec an" style="text-align:center">Full <em>Colab Demo</em> + Mini Project</h2>
+      <p class="lead an" style="text-align:center;margin:0 auto 24px">We now code everything from Video B live — vectorised ops, broadcasting, aggregations, reshape, random module, and the student analytics project.</p>
+      <div class="g2 an" style="gap:10px;max-width:460px;margin:0 auto">
+        <div class="chip or" style="justify-content:center;padding:11px">➕ Math Operations</div>
+        <div class="chip nv" style="justify-content:center;padding:11px">📡 Broadcasting Demo</div>
+        <div class="chip tl" style="justify-content:center;padding:11px">📊 axis=0 vs axis=1</div>
+        <div class="chip gd" style="justify-content:center;padding:11px">🔄 Reshape Mastery</div>
+        <div class="chip gn" style="justify-content:center;padding:11px">🎲 Random Module</div>
+        <div class="chip rb" style="justify-content:center;padding:11px">🏆 Full Mini Project</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 17 — MODULE 2 PREVIEW ══════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">What's Next</div></div>
+    <div class="hstrip-right"><div class="video-tag v2">Video B · Outro</div><div class="slide-num">17 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:85%"></div></div>
+  <div class="body split">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+      <div class="eyebrow an">Coming Up Next</div>
+      <h2 class="sec an">Module 2: <em>Pandas</em><br>— Data's Best Friend</h2>
+      <p class="body-t an" style="margin-bottom:18px">NumPy is the engine. Pandas is the cockpit. In Module 2 we load real CSV files, manipulate tables, filter rows, group data, and merge datasets — the skills that will fill 90% of your day as a data analyst.</p>
+      <div class="cklist an">
+        <div class="cki"><div class="cki-icon" style="background:var(--accent-bg);color:var(--accent)">🐼</div><div class="cki-t"><strong>DataFrames</strong> — the core Pandas object (like a supercharged spreadsheet)</div></div>
+        <div class="cki"><div class="cki-icon" style="background:var(--navy-bg);color:var(--navy)">📂</div><div class="cki-t"><strong>Loading CSVs</strong> — read_csv, first look at the Titanic dataset</div></div>
+        <div class="cki"><div class="cki-icon" style="background:var(--teal-bg);color:var(--teal)">🔍</div><div class="cki-t"><strong>loc & iloc</strong> — the two selection methods every analyst must know</div></div>
+        <div class="cki"><div class="cki-icon" style="background:var(--green-bg);color:var(--green)">📊</div><div class="cki-t"><strong>GroupBy</strong> — summarise data by category in one line</div></div>
+      </div>
+    </div>
+    <div style="width:240px;display:flex;flex-direction:column;justify-content:center;gap:14px" class="an">
+      <div class="card" style="background:var(--accent-bg);border-color:var(--accent-mid)">
+        <div class="card-label" style="color:var(--accent)">🏠 Homework</div>
+        <div style="font-size:13px;color:var(--ink-soft);line-height:1.7">Open today's notebook. Complete the 3 bonus exercises at the bottom. Share your output in the comments!</div>
+      </div>
+      <div class="code" style="font-size:11.5px">
+        <span class="cm"># Bonus Challenge</span><br>
+        arr = np.random.<span class="fn">randint</span>(<span class="nm">1</span>,<span class="nm">7</span>,(<span class="nm">1000</span>,<span class="nm">2</span>))<br>
+        <span class="cm"># Simulate 1000 dice rolls</span><br>
+        <span class="cm"># Find: most common sum</span><br>
+        <span class="cm"># Find: probability sum == 7</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 18 — NUMPY CHEATSHEET ══════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">NumPy Quick Reference</div></div>
+    <div class="hstrip-right"><div class="slide-num">18 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:90%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">Reference Card</div>
+    <h2 class="sec an">NumPy <em>Cheat Sheet</em></h2>
+    <div class="g3 an" style="gap:14px">
+      <div class="card">
+        <div class="card-label" style="color:var(--accent)">🏗 Creation</div>
+        <div style="font-size:12px;font-family:'JetBrains Mono';line-height:2.1;color:var(--ink-mid)">
+          np.array([...])<br>np.zeros((r,c))<br>np.ones((r,c))<br>np.arange(s,e,step)<br>np.linspace(s,e,n)<br>np.eye(n)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--navy)">🔬 Inspect</div>
+        <div style="font-size:12px;font-family:'JetBrains Mono';line-height:2.1;color:var(--ink-mid)">
+          a.shape<br>a.ndim<br>a.size<br>a.dtype<br>a.astype(float)<br>a.T
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--teal)">✂️ Index & Slice</div>
+        <div style="font-size:12px;font-family:'JetBrains Mono';line-height:2.1;color:var(--ink-mid)">
+          a[i]<br>a[r, c]<br>a[1:4]<br>a[:, 0]<br>a[a > 50]<br>a[::2]
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--green)">📐 Math</div>
+        <div style="font-size:12px;font-family:'JetBrains Mono';line-height:2.1;color:var(--ink-mid)">
+          a + b, a * b<br>np.dot(a, b)<br>np.sqrt(a)<br>np.exp(a)<br>np.log(a)<br>np.abs(a)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--gold)">📊 Aggregate</div>
+        <div style="font-size:12px;font-family:'JetBrains Mono';line-height:2.1;color:var(--ink-mid)">
+          np.sum(a, axis=)<br>np.mean(a, axis=)<br>np.std(a)<br>np.min/max(a)<br>np.argmin/argmax<br>np.cumsum(a)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--ruby)">🎲 Random</div>
+        <div style="font-size:12px;font-family:'JetBrains Mono';line-height:2.1;color:var(--ink-mid)">
+          np.random.seed(n)<br>np.random.rand(r,c)<br>np.random.randn(n)<br>np.random.randint(l,h)<br>np.random.normal(μ,σ)<br>np.random.choice(a)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 19 — RESOURCES ══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Module 1 Resources</div></div>
+    <div class="hstrip-right"><div class="slide-num">19 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:95%"></div></div>
+  <div class="body">
+    <div class="eyebrow an">Go Deeper</div>
+    <h2 class="sec an">Everything you need to <em>master NumPy</em></h2>
+    <div class="g3 an" style="gap:14px">
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">📘</div><div class="card-label" style="color:var(--accent)">NumPy Docs</div><div class="body-t">numpy.org/doc/stable/<br><br>Official quickstart tutorial — the best single resource.</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">🎨</div><div class="card-label" style="color:var(--navy)">Jay Alammar's Visual Guide</div><div class="body-t">jalammar.github.io<br><br>The most visually beautiful NumPy explanation on the internet.</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">🎓</div><div class="card-label" style="color:var(--teal)">Stanford CS231n</div><div class="body-t">cs231n.github.io<br><br>Python & NumPy tutorial — used by Stanford ML students.</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">📊</div><div class="card-label" style="color:var(--green)">DataCamp Cheatsheet</div><div class="body-t">Free PDF cheatsheet — search "DataCamp NumPy cheatsheet".</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">📓</div><div class="card-label" style="color:var(--gold)">Today's Notebook</div><div class="body-t">Link in video description<br><br>All code from both videos, with exercises.</div></div>
+      <div class="card" style="background:var(--accent-bg);border-color:var(--accent-mid)"><div style="font-size:22px;margin-bottom:8px">⚡</div><div class="card-label" style="color:var(--accent)">HackSkill</div><div class="body-t">hackskill.in<br><br>Register for your free certificate on completion.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 20 — THANK YOU ══════════════════════════════════════════ -->
+<div class="slide">
+  <div class="hstrip">
+    <div class="hstrip-left"><div class="module-badge">Module 1</div><div class="hstrip-title">Complete</div></div>
+    <div class="hstrip-right"><div class="slide-num">20 / 20</div></div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
+  <div class="body center">
+    <div style="max-width:600px">
+      <div style="font-size:68px;margin-bottom:18px" class="an">🔢</div>
+      <div class="eyebrow an" style="justify-content:center">Module 1 Complete</div>
+      <h1 class="cover-title an" style="text-align:center;font-size:clamp(28px,3.5vw,46px)">You now speak <em>NumPy.</em><br>The foundation is set.</h1>
+      <p class="lead an" style="text-align:center;max-width:480px;margin:0 auto 28px">In Module 2 we put this foundation to work — loading real-world datasets into Pandas DataFrames and asking meaningful questions with just a few lines of code.</p>
+      <div class="g3 an" style="gap:10px;margin-bottom:24px">
+        <div class="chip or" style="justify-content:center;padding:11px 14px;border-radius:10px">👍 Like the video</div>
+        <div class="chip nv" style="justify-content:center;padding:11px 14px;border-radius:10px">🔔 Subscribe</div>
+        <div class="chip gn" style="justify-content:center;padding:11px 14px;border-radius:10px">⚡ hackskill.in</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:22px;padding-top:22px;border-top:1px solid var(--border)" class="an">
+        <div style="text-align:center">
+          <div style="font-family:'Fraunces',serif;font-size:17px;color:var(--accent)">⚡ HackSkill</div>
+          <div style="font-size:11px;color:var(--muted)">hackskill.in</div>
+        </div>
+        <div style="width:1px;height:38px;background:var(--border)"></div>
+        <div style="text-align:center">
+          <div style="font-size:14px;font-weight:700;color:var(--ink)">Aditya Srivastava</div>
+          <div style="font-size:11px;color:var(--muted)">Founder · Oracle Certified Cloud Associate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<div class="nav">
+  <button class="nav-btn" onclick="go(-1)">‹</button>
+  <button class="nav-btn" onclick="go(1)">›</button>
+</div>
+<div class="hint">← → arrow keys to navigate</div>
+
+<script>
+  let cur = 0;
+  const slides = document.querySelectorAll('.slide');
+  const N = slides.length;
+  function go(d) {
+    slides[cur].classList.remove('active');
+    cur = (cur + d + N) % N;
+    slides[cur].classList.add('active');
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key==='ArrowRight'||e.key==='ArrowDown') go(1);
+    if (e.key==='ArrowLeft' ||e.key==='ArrowUp')   go(-1);
+  });
+</script>
+</body>
+</html>
